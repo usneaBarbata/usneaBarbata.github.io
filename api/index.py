@@ -6,7 +6,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)  # Enable CORS for frontend communication
 
-DATA_FILE = 'repertoire.json'
+DATA_FILE = '/tmp/repertoire.json'  # Use /tmp for Vercel's writable filesystem
 
 def load_contacts():
     if os.path.exists(DATA_FILE):
@@ -45,6 +45,3 @@ def search_contact():
             return jsonify({'name': contact['name'], 'phone': contact['phone']})
     
     return jsonify({'error': 'Contact not found'}), 404
-
-if __name__ == '__main__':
-    app.run()
