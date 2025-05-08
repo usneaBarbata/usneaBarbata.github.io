@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Online Phonebook</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px 0;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .contact-list {
+      margin-top: 20px;
+      padding: 10px;
+      border-top: 1px solid #ccc;
+    }
+    .contact-item {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Phonebook</h1>
+    
+    <h3>Add Contact</h3>
+    <input type="text" id="name" placeholder="Enter Name">
+    <input type="text" id="phone" placeholder="Enter Phone Number">
+    <button onclick="addContact()">Add Contact</button>
+    
+    <h3>Search Contacts</h3>
+    <input type="text" id="search" placeholder="Search by Name" oninput="searchContacts()">
+    
+    <div class="contact-list" id="contact-list">
+      <!-- Contact results will appear here -->
+    </div>
+  </div>
+
+  <script>
+    const apiUrl = 'https://your-vercel-backend-url.vercel.app/api/contacts';
+
+    async function addContact() {
+      const name = document.getElementById('name').value;
+      const phone = document.getElementById('phone').value;
+      
+      if (name && phone) {
+        const response = await fetch(`${apiUrl}/add`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, phone })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          alert('Contact added!');
+          document.getElementById('name').value = '';
+          document.getElementById('phone').value = '';
+          searchContacts();
+        } else {
+          alert('Error adding contact!');
+        }
+      } else {
+        alert('Please fill in both fields!');
+      }
+    }
+
+    async function searchContacts() {
+      const query = document.getElementById('search').value;
+      const response = await fetch(`${apiUrl}/search?name=${query}`);
+      const contacts = await response.json();
+      
+      const contactList = document.getElementById('contact-list');
+      contactList.innerHTML = '';
+      
+      contacts.forEach(contact => {
+        const contactItem = document.createElement('div');
+        contactItem.classList.add('contact-item');
+        contactItem.textContent = `${contact.name}: ${contact.phone}`;
+        contactList.appendChild(contactItem);
+      });
+    }
+  </script>
+</body>
+</html>
